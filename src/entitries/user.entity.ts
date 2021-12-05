@@ -1,10 +1,6 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from './base.entity'
-
-export enum GenderRole {
-  MALE = 0,
-  FEMALE = 1
-}
+import { GenderRole } from './entity.interface'
 
 @Entity('user')
 export class UserModel extends BaseEntity {
