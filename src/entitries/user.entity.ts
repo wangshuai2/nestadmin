@@ -32,7 +32,7 @@ export class UserModel extends BaseEntity {
   @Column({ nullable: true, unique: true })
   phone: string
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   mail: string
 
   @Column({ nullable: true })
