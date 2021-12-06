@@ -1,20 +1,23 @@
-import { Module } from '@nestjs/common'
+import { CacheModule, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-// import { RedisModule } from 'nestjs-redis'
+// import type { ClientOpts as RedisClientOpts } from 'redis'
+import * as redisStore from 'cache-manager-redis-store'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
-import { MRedisModule } from './redis/redis.module'
+import { TagModule } from './tag/tag.module'
 
 @Module({
   imports: [
-    // RedisModule.register({
-    //   host: '120.53.107.237',
-    //   port: 16379,
-    //   password: 'midwayRedis!',
-    //   db: 13,
-    //   keyPrefix: 'snd'
-    // }),
+    CacheModule.register({
+      store: redisStore,
+      isGlobal: true,
+      host: '120.53.107.237',
+      port: 16379,
+      auth_pass: 'midwayRedis!',
+      db: 0,
+      ttl: 600
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: '120.53.107.237',
@@ -26,7 +29,8 @@ import { MRedisModule } from './redis/redis.module'
       logging: true,
       entities: ['dist/**/*.entity.js']
     }),
-    AuthModule
+    AuthModule,
+    TagModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,4 +1,10 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  HttpStatus,
+  Inject,
+  Injectable
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserModel } from 'src/entitries/user.entity'
 import { Repository } from 'typeorm'
@@ -6,12 +12,14 @@ import { SignInDTO, SignUpDTO } from './auth.dto'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import { TOKEN_SECRET } from 'src/common/config/config.default'
+import { Cache } from 'cache-manager'
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserModel)
-    private readonly userRepository: Repository<UserModel>
+    private readonly userRepository: Repository<UserModel>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   private async findOne(username: string): Promise<UserModel> {
@@ -26,9 +34,16 @@ export class AuthService {
         console.log('验证成功！')
         const token = this.generateJwt(user)
         delete user.password
-        // const redisClient = await this.redisService.getClient()
-        // await redisClient.set(`user:data:${username}`, user.toString(), 'ex')
-        // await this.cache.set('test', 'wang')
+
+        const cacheval = await this.cacheManager.set(
+          `user:data:${username}`,
+          JSON.stringify(user),
+          {
+            ttl: 0
+          }
+        )
+        console.log(cacheval)
+
         return {
           code: HttpStatus.OK,
           message: 'success',

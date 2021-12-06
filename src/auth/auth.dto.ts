@@ -1,5 +1,5 @@
-import { IsEnum, IsNotEmpty, IsString } from "class-validator"
-import { GenderRole } from "src/entitries/entity.interface"
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import { GenderRole } from 'src/entitries/entity.interface'
 
 export class SignInDTO {
   @IsNotEmpty()
