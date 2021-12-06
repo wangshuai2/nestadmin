@@ -15,8 +15,8 @@ export const dbProvider = {
       port: 15432,
       username: 'postgres',
       password: 'pgMidwaY!',
-      // database: 'nest_test',
-      database: 'midway_test',
+      database: 'nest_test',
+      // database: 'midway_test',
       synchronize: true,
       logging: true,
       entities: [
