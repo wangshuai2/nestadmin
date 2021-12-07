@@ -5,23 +5,23 @@ import { StatusType } from './entity.interface'
 
 @Entity('article')
 export class ArticleModel extends BaseEntity {
-  @Column()
+  @Column({ nullable: false })
   title: string
 
-  @Column()
+  @Column({ nullable: false })
   content: string
 
-  @Column()
+  @Column({ nullable: true, default: 0 })
   like: number
 
-  @Column()
+  @Column({ nullable: true, default: 0 })
   comments_num: number
 
-  @Column()
+  @Column({ nullable: true, default: 0 })
   views: number
 
-  @OneToMany(type => CommentModel, comment => comment.article)
-  comments: CommentModel[]
+  // @OneToMany(type => CommentModel, comment => comment.article)
+  // comments: CommentModel[]
 
   @Column({ enum: StatusType, default: StatusType.FALSE })
   status: StatusType

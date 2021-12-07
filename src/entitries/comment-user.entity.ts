@@ -13,6 +13,6 @@ export class CommentUserModel extends BaseEntity {
   @Column()
   mail: string
 
-  @Column({ default: StatusType.FALSE, enum: StatusType })
-  status: StatusType
+  // @Column({ default: StatusType.FALSE, enum: StatusType })
+  // status: StatusType
 }

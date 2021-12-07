@@ -4,21 +4,21 @@ import { StatusType } from './entity.interface'
 
 @Entity('category')
 export class CategoryModel extends BaseEntity {
-  @Column()
+  @Column({ nullable: false })
   category_title: string
 
-  @Column()
+  @Column({ nullable: true })
   alias_name: string
 
-  @Column()
+  @Column({ nullable: true })
   description: string
 
-  @Column()
+  @Column({ nullable: false, default: 0 })
   level: number
 
-  @Column()
+  @Column({ nullable: true })
   parent_id: number
 
-  @Column({ enum: StatusType, default: StatusType.FALSE })
+  @Column({ nullable: false, enum: StatusType, default: StatusType.FALSE })
   status: StatusType
 }

@@ -6,6 +6,9 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { TagModule } from './tag/tag.module'
+import { CategoryModule } from './category/category.module'
+import { ArticleController } from './article/article.controller'
+import { ArticleModule } from './article/article.module'
 
 @Module({
   imports: [
@@ -27,10 +30,12 @@ import { TagModule } from './tag/tag.module'
       database: 'nest_test',
       synchronize: true,
       logging: true,
-      entities: ['dist/**/*.entity.js']
+      entities: ['dist/entitries/*.entity.js']
     }),
     AuthModule,
-    TagModule
+    TagModule,
+    CategoryModule,
+    ArticleModule
   ],
   controllers: [AppController],
   providers: [AppService]

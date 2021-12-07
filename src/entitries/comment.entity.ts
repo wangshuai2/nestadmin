@@ -23,10 +23,10 @@ export class CommentModel extends BaseEntity {
   @Column()
   parent_id: number
 
-  @OneToOne(type => CommentUserModel)
-  @JoinColumn()
-  public_author: CommentUserModel
+  // @OneToOne(type => CommentUserModel)
+  // @JoinColumn()
+  // public_author: CommentUserModel
 
-  @ManyToOne(type => ArticleModel, author => author.comments)
-  article: ArticleModel
+  // @ManyToOne(type => ArticleModel, author => author.comments)
+  // article: ArticleModel
 }
