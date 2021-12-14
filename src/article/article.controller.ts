@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common'
 import { ArticleService } from './article.service'
 import { CreateArticleDTO } from './article.dto'
+import { IQueryPages } from '../interfaces/query-pages.interface'
 
 @Controller('article')
 export class ArticleController {
@@ -13,6 +14,11 @@ export class ArticleController {
 
   @Post('/createArticle')
   async create(@Body() article: CreateArticleDTO) {
-    return this.articleService.createArticle(article)
+    return await this.articleService.createArticle(article)
+  }
+
+  @Get('/articleList')
+  async articlelist(@Query() query: IQueryPages) {
+    return await this.articleService.getAllArticles(query)
   }
 }
