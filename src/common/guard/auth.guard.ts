@@ -4,7 +4,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const req = context.switchToHttp().getRequest()
-    const whiteList = ['/auth/signin', '/auth/signup']
+    const whiteList = ['/auth/signin', '/auth/signup', '/auth/test']
     if (whiteList.includes(req.url)) {
       return true
     } else {
