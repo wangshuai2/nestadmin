@@ -3,7 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { ArticleModel } from '../entitries/article.entity'
 import { CreateArticleDTO } from './article.dto'
+import { IQueryPages } from '../interfaces/query-pages.interface'
 
+interface IListData {
+  list: ArticleModel[]
+  total: number
+  current: number
+  size: number
+}
+
+interface IListRes {
+  code: HttpStatus
+  message: string
+  data: IListData
+}
 @Injectable()
 export class ArticleService {
   constructor(
@@ -67,6 +80,36 @@ export class ArticleService {
         code: HttpStatus.BAD_REQUEST,
         message: '标题重复',
         data: ''
+      }
+    }
+  }
+
+  async getAllArticles(query: IQueryPages) {
+    let { current, pageSize } = query
+    current = current ? current : 1
+    pageSize = pageSize ? pageSize : 10
+
+    try {
+      const [result, total] = await this.articleRepository.findAndCount({
+        skip: current,
+        take: pageSize
+      })
+
+      return {
+        code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          list: result,
+          total,
+          current: Number(current),
+          size: Number(pageSize)
+        }
+      }
+    } catch (error) {
+      return {
+        code: HttpStatus.BAD_REQUEST,
+        message: error.detail,
+        data: {}
       }
     }
   }

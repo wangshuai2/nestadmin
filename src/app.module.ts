@@ -7,7 +7,7 @@ import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { TagModule } from './tag/tag.module'
 import { CategoryModule } from './category/category.module'
-import { ArticleController } from './article/article.controller'
+// import { ArticleController } from './article/article.controller'
 import { ArticleModule } from './article/article.module'
 
 @Module({
