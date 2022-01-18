@@ -21,4 +21,6 @@ export class ArticleController {
   async articlelist(@Query() query: IQueryPages) {
     return await this.articleService.getAllArticles(query)
   }
+
+  // @Get('/setArticleStatus')
 }

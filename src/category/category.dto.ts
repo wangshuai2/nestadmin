@@ -1,4 +1,10 @@
-import { IsDefined, IsIn, IsNotEmpty, IsString } from 'class-validator'
+import {
+  IsDefined,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString
+} from 'class-validator'
 import { StatusType } from 'src/entitries/entity.interface'
 
 /**
@@ -12,9 +18,11 @@ export class CreateCategoryDTO {
   @IsString()
   categoryTitle: string
 
+  @IsOptional()
   @IsString()
   aliasName: string
 
+  @IsOptional()
   @IsString()
   description: string
 }
@@ -27,4 +35,16 @@ export class CategoryStatusDTO {
   @IsNotEmpty()
   @IsIn(['0', '1', '2'])
   status: StatusType
+}
+
+export class UpdateCategoryDto extends CreateCategoryDTO {
+  @IsNotEmpty()
+  @IsDefined()
+  id: number
+}
+
+export class DeleteCategoryDto {
+  @IsNotEmpty()
+  @IsDefined()
+  id: number
 }

@@ -1,25 +1,33 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { ArticleModel } from 'src/entitries/article.entity'
 import { IQueryPages } from 'src/interfaces/query-pages.interface'
 import { Repository } from 'typeorm'
 import { CategoryModel } from '../entitries/category.entity'
-import { CategoryStatusDTO, CreateCategoryDTO } from './category.dto'
+import {
+  CategoryStatusDTO,
+  CreateCategoryDTO,
+  DeleteCategoryDto,
+  UpdateCategoryDto
+} from './category.dto'
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryModel)
-    private readonly categoryRepository: Repository<CategoryModel>
+    private readonly categoryRepository: Repository<CategoryModel>,
+    @InjectRepository(ArticleModel)
+    private readonly articleRepository: Repository<ArticleModel>
   ) {}
 
   /**
    * 分页获取分类数据
    *
    * @param {IQueryPages} query
-   * @return {*}
+   * @return {*}  {Promise<any>}
    * @memberof CategoryService
    */
-  async getCategoryList(query: IQueryPages) {
+  async getCategoryList(query: IQueryPages): Promise<any> {
     let { current, pageSize } = query
     current = current ? current : 1
     pageSize = pageSize ? pageSize : 10
@@ -37,11 +45,11 @@ export class CategoryService {
       const [result, total] = await this.categoryRepository.findAndCount({
         select: [
           'id',
-          'category_title',
-          'alias_name',
+          'categoryTitle',
+          'aliasName',
           'description',
           'level',
-          'parent_id',
+          'parentId',
           'status'
         ],
         where,
@@ -69,15 +77,15 @@ export class CategoryService {
   }
 
   /**
-   * 根据标题查找一个分类
+   * 根据标题查找一个分类，避免重名使用
    *
    * @param {string} cate
-   * @return {*}
+   * @return {CategoryModel}  {Promise<CategoryModel>}
    * @memberof CategoryService
    */
-  async findOne(cate: string) {
+  async findOne(cate: string): Promise<CategoryModel> {
     const query = await this.categoryRepository.findOne({
-      category_title: cate
+      categoryTitle: cate
     })
     return query
   }
@@ -86,15 +94,15 @@ export class CategoryService {
    * 创建一个分类
    *
    * @param {CreateCategoryDTO} info
-   * @return {*}
+   * @return {*}  {Promise<any>}
    * @memberof CategoryService
    */
-  async createCate(info: CreateCategoryDTO) {
+  async createCate(info: CreateCategoryDTO): Promise<any> {
     const isHas = await this.findOne(info.categoryTitle)
     if (!isHas) {
       const cate = new CategoryModel()
-      cate.category_title = info.categoryTitle
-      cate.alias_name = info.aliasName
+      cate.categoryTitle = info.categoryTitle
+      cate.aliasName = info.aliasName
       cate.description = info.description
 
       const res = await this.categoryRepository.save(cate)
@@ -111,6 +119,17 @@ export class CategoryService {
       }
     }
   }
+  /**
+   * 根据分类ID查询文章
+   *
+   * @private
+   * @param {number} cateId
+   * @return {*}  {Promise<any>}
+   * @memberof CategoryService
+   */
+  private async findArticleByCateId(cateId: number): Promise<any> {
+    return await this.articleRepository.find({ where: { category_id: cateId } })
+  }
 
   /**
    * 设置标签状态
@@ -119,8 +138,15 @@ export class CategoryService {
    * @return {*}
    * @memberof CategoryService
    */
-  async setCateStatus(cateData: CategoryStatusDTO) {
+  async setCateStatus(cateData: CategoryStatusDTO): Promise<any> {
     try {
+      const articleList = await this.findArticleByCateId(cateData.id)
+      if (!articleList) {
+        return {
+          code: HttpStatus.BAD_REQUEST,
+          message: '此分类下包含有文章数据，不可修改状态'
+        }
+      }
       const cate = await this.categoryRepository.findOne({ id: cateData.id })
       if (!cate) {
         return {
@@ -141,6 +167,113 @@ export class CategoryService {
         code: HttpStatus.BAD_REQUEST,
         message: error.detail,
         data: ''
+      }
+    }
+  }
+
+  /**
+   * 删除分类
+   *
+   * @param {DeleteCategoryDto} cateData
+   * @return {*}  {Promise<any>}
+   * @memberof CategoryService
+   */
+  async deleteCategory(cateData: DeleteCategoryDto): Promise<any> {
+    try {
+      const articleList = await this.findArticleByCateId(cateData.id)
+      if (!articleList) {
+        return {
+          code: HttpStatus.BAD_REQUEST,
+          message: '此分类下包含有文章数据，不可删除'
+        }
+      }
+      const cate = await this.categoryRepository.findOne({ id: cateData.id })
+      if (!cate) {
+        return {
+          code: HttpStatus.BAD_REQUEST,
+          message: '您所要删除的分类数据不存在',
+          data: ''
+        }
+      }
+
+      await this.categoryRepository.remove(cate)
+      return {
+        code: HttpStatus.OK,
+        message: 'success',
+        data: null
+      }
+    } catch (error) {
+      return {
+        code: HttpStatus.BAD_REQUEST,
+        message: error.detail,
+        data: ''
+      }
+    }
+  }
+
+  /**
+   * 根据分类ID获取分类数据
+   *
+   * @private
+   * @param {number} id
+   * @return {CategoryModel}  {Promise<CategoryModel>}
+   * @memberof CategoryService
+   */
+  private async findById(id: number): Promise<CategoryModel> {
+    return await this.categoryRepository.findOne({
+      select: ['id', 'categoryTitle', 'aliasName', 'description'],
+      where: { id }
+    })
+  }
+
+  /**
+   * 更新分类信息
+   *
+   * @param {UpdateCategoryDto} data
+   * @return {*}  {Promise<any>}
+   * @memberof CategoryService
+   */
+  async upateCategory(data: UpdateCategoryDto): Promise<any> {
+    try {
+      const nowData = await this.findById(data.id)
+      delete data.id
+      Object.assign(nowData, data)
+      console.log(nowData)
+      // nowData.category_title = data.categoryTitle
+      // nowData.alias_name = data.aliasName || nowData.aligs_name
+      // nowData.description = data.description || nowData.description
+
+      const res = await this.categoryRepository.save(nowData)
+      return {
+        code: HttpStatus.OK,
+        message: 'success',
+        data: res
+      }
+    } catch (error) {
+      return {
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.detail,
+        data: null
+      }
+    }
+  }
+
+  async getAllCategory(): Promise<any> {
+    try {
+      const res = await this.categoryRepository.find({
+        select: ['id', 'categoryTitle', 'aliasName', 'description'],
+        where: { status: 1 }
+      })
+      return {
+        code: HttpStatus.OK,
+        message: 'success',
+        data: res
+      }
+    } catch (error) {
+      return {
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.detail,
+        data: null
       }
     }
   }
