@@ -4,11 +4,11 @@ import { StatusType } from './entity.interface'
 
 @Entity('category')
 export class CategoryModel extends BaseEntity {
-  @Column({ nullable: false })
-  category_title: string
+  @Column({ nullable: false, name: 'category_title' })
+  categoryTitle: string
 
-  @Column({ nullable: true, default: null })
-  alias_name: string
+  @Column({ nullable: true, default: null, name: 'alias_name' })
+  aliasName: string
 
   @Column({ nullable: true, default: null })
   description: string
@@ -16,8 +16,8 @@ export class CategoryModel extends BaseEntity {
   @Column({ nullable: false, default: 0 })
   level: number
 
-  @Column({ nullable: true, default: 0 })
-  parent_id: number
+  @Column({ nullable: true, default: 0, name: 'parent_id' })
+  parentId: number
 
   @Column({
     nullable: false,
