@@ -5,3 +5,9 @@ export interface IQueryPages {
   pageSize?: number
   status?: TypeStatus
 }
+
+export interface IArtCate {
+  current?: number
+  pageSize?: number
+  category: number
+}

@@ -24,14 +24,17 @@ export class ArticleModel extends BaseEntity {
   @Column({ nullable: true, default: 0 })
   views: number
 
-  @Column({ nullable: true, default: 0 })
-  comments_num: number
+  @Column({ nullable: true, default: 0, name: 'comments_num' })
+  commentsNum: number
 
   @Column({ enum: StatusType, default: StatusType.FALSE })
   status: StatusType
 
-  @Column({ nullable: true, default: null })
-  category_id: number
+  @Column({ nullable: true, default: null, name: 'category_id', type: 'int' })
+  categoryId: number
+
+  @Column({ nullable: true, default: 1, name: 'is_droped', type: 'int' })
+  isDroped: number
 
   // @OneToMany(type => CommentModel, comment => comment.article)
   // comments: CommentModel[]
